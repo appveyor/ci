@@ -1,5 +1,5 @@
-# get current IP
-$ip = (Get-NetIPAddress –AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like '*ethernet*'}).IPAddress
+﻿# get current IP
+$ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like '*ethernet*'}).IPAddress
 
 # generate password
 $randomObj = New-Object System.Random
