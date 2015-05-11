@@ -14,6 +14,7 @@ if(-not (Test-Path $appveyorModulePath)) {
 # download installer module
 Write-Host "Downloading appveyor-installer.psm1 to $appveyorModulePath"
 (New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/appveyor/ci/master/on-premise/appveyor-installer.psm1', "$appveyorModulePath\appveyor-installer.psm1")
+
 $psPath = $env:PSModulePath
 if($psPath.indexOf($userModulesPath) -eq -1) {
     Write-Host "Updating PSModulePath variable"

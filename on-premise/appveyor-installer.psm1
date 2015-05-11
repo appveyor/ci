@@ -1114,15 +1114,15 @@ Install-AppVeyor -Scenario AllInOne
 #>
 
 function Install-AppVeyor {
-    Write-Host "Install AppVeyor role(s)"
+    Write-Host "Install AppVeyor role(s)" -ForegroundColor Gray
 }
 
 function Update-AppVeyor {
-    Write-Host "Update AppVeyor role(s)"
+    Write-Host "Update AppVeyor role(s)" -ForegroundColor Gray
 }
 
 function Uninstall-AppVeyor {
-    Write-Host "Uninstall AppVeyor role(s)"
+    Write-Host "Uninstall AppVeyor role(s)" -ForegroundColor Gray
 }
 
 Export-ModuleMember -Function Install-AppVeyor,Update-AppVeyor,Uninstall-AppVeyor
