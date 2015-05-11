@@ -1125,5 +1125,4 @@ function Uninstall-AppVeyor {
     Write-Host "Uninstall AppVeyor role(s)"
 }
 
-Export-ModuleMember -Function `
-    Install-AppVeyor,Update-AppVeyor,Uninstall-AppVeyor
+Export-ModuleMember -Function Install-AppVeyor,Update-AppVeyor,Uninstall-AppVeyor
