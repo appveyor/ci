@@ -1,5 +1,10 @@
-﻿# get current IP
+# get current IP
 $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like '*ethernet*'}).IPAddress
+
+# this is how to get IP of Azure VM
+#$wc = (New-Object Net.WebClient)
+#$wc.Headers.Add("User-Agent", "AppVeyor")
+#$vmip = $wc.DownloadString('http://canhazip.com/')
 
 # generate password
 $randomObj = New-Object System.Random
