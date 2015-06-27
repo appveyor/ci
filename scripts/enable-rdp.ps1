@@ -25,10 +25,10 @@ $ip = $wc.DownloadString('http://canhazip.com/').Trim()
 # allow RDP on firewall
 Enable-NetFirewallRule -DisplayName 'Remote Desktop - User Mode (TCP-in)'
 
-Write-Warning "To connect this build worker via RDP:"
-Write-Warning "Server: $ip`:$port"
-Write-Warning "Username: appveyor"
-Write-Warning "Password: $password"
+Write-Host "Remote Desktop connection details:" -ForegroundColor Yellow
+Write-Host "  Server: $ip`:$port" -ForegroundColor Gray
+Write-Host "  Username: appveyor" -ForegroundColor Gray
+Write-Host "  Password: $password" -ForegroundColor Gray
 
 if($blockRdp) {
     # place "lock" file
