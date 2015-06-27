@@ -1,31 +1,40 @@
 # get current IP
 $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like '*ethernet*'}).IPAddress
+$port = 3389
 
-# this is how to get IP of Azure VM
-#$wc = (New-Object Net.WebClient)
-#$wc.Headers.Add("User-Agent", "AppVeyor")
-#$vmip = $wc.DownloadString('http://canhazip.com/')
+if($ip.StartsWith('192.168.')) {
+    # new environment - behind NAT
+    $port = '338' + $ip.split('.')[3].padLeft(2, '0')
+    $password = [Microsoft.Win32.Registry]::GetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", '')
+} else {
+    # generate password
+    $randomObj = New-Object System.Random
+    $password = ""
+    1..12 | ForEach { $password = $password + [char]$randomObj.next(33,126) }
 
-# generate password
-$randomObj = New-Object System.Random
-$newPassword = ""
-1..12 | ForEach { $newPassword = $newPassword + [char]$randomObj.next(33,126) }
+    # change password
+    $objUser = [ADSI]("WinNT://$($env:computername)/appveyor")
+    $objUser.SetPassword($password)   
+}
 
-# change password
-$objUser = [ADSI]("WinNT://$($env:computername)/appveyor")
-$objUser.SetPassword($newPassword)
+# get external IP
+$wc = (New-Object Net.WebClient)
+$wc.Headers.Add("User-Agent", "AppVeyor")
+$ip = $wc.DownloadString('http://canhazip.com/').Trim()
 
 # allow RDP on firewall
 Enable-NetFirewallRule -DisplayName 'Remote Desktop - User Mode (TCP-in)'
 
-# place "lock" file
-$path = "$($env:USERPROFILE)\Desktop\Delete me to continue build.txt"
-Set-Content -Path $path -Value ''
-
 Write-Warning "To connect this build worker via RDP:"
-Write-Warning "Server: $ip"
+Write-Warning "Server: $ip`:$port"
 Write-Warning "Username: appveyor"
-Write-Warning "Password: $newPassword"
-Write-Warning "There is 'Delete me to continue build.txt' file has been created on Desktop - delete it to continue the build."
+Write-Warning "Password: $password"
 
-while($true) { if (-not (Test-Path $path)) { break; } else { Start-Sleep -Seconds 1 } }
+if($blockRdp) {
+    # place "lock" file
+    $path = "$($env:USERPROFILE)\Desktop\Delete me to continue build.txt"
+    Set-Content -Path $path -Value ''    
+    Write-Warning "There is 'Delete me to continue build.txt' file has been created on Desktop - delete it to continue the build."
+
+    while($true) { if (-not (Test-Path $path)) { break; } else { Start-Sleep -Seconds 1 } }
+}
