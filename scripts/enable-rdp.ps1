@@ -20,7 +20,7 @@ if($ip.StartsWith('192.168.')) {
 # get external IP
 $wc = (New-Object Net.WebClient)
 $wc.Headers.Add("User-Agent", "AppVeyor")
-$ip = $wc.DownloadString('http://canhazip.com/').Trim()
+$ip = $wc.DownloadString('https://canhazip.com/').Trim()
 
 # allow RDP on firewall
 Enable-NetFirewallRule -DisplayName 'Remote Desktop - User Mode (TCP-in)'
