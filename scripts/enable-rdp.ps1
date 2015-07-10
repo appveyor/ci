@@ -1,5 +1,5 @@
 # Enable SSL3
-[Net.ServicePointManager]::SecurityProtocol = 'ssl3'
+[Net.ServicePointManager]::SecurityProtocol = 'Tls12'
 
 # get current IP
 $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like '*ethernet*'}).IPAddress
