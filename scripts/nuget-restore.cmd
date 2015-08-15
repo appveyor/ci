@@ -11,7 +11,7 @@ rem problem?
 IF ERRORLEVEL %errorCode% GOTO :RETRY
 
 rem everything is fine!
-GOTO :EXIT
+GOTO :EOF
 
 :RETRY
 @echo Oops, nuget restore exited with code %errorCode% - let us try again!
@@ -22,5 +22,3 @@ IF %retryNumber% EQU %maxRetries% (GOTO :ERR)
 :ERR
 @echo Sorry, we tried restoring nuget packages for %maxRetries% times and all attempts were unsuccessful!
 EXIT /B 1
-
-:EXIT
