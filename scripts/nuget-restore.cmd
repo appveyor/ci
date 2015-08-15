@@ -8,12 +8,7 @@ set maxRetries=3
 nuget restore %*
 
 rem problem?
-IF ERRORLEVEL %errorCode% GOTO :RETRY
-
-rem everything is fine!
-GOTO :EOF
-
-:RETRY
+IF NOT ERRORLEVEL %errorCode% GOTO :EOF
 @echo Oops, nuget restore exited with code %errorCode% - let us try again!
 set /a retryNumber=%retryNumber%+1
 IF %reTryNumber% LSS %maxRetries% (GOTO :RESTORE)
