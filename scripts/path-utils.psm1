@@ -58,5 +58,18 @@ function Get-SanitizedPath([string]$path) {
     return $path.Replace('/', '\').Trim('\')
 }
 
+function Add-SessionPath([string]$path) {
+
+    $sanitizedPath = Get-SanitizedPath $path
+
+    foreach($item in $env:path.Split(";")) {
+        if($sanitizedPath -eq (Get-SanitizedPath $item)) {
+            return # already added
+        }
+    }
+
+    $env:path = "$sanitizedPath;$env:path"
+}
+
 # export module members
-Export-ModuleMember -Function Get-Path, Add-Path, Remove-Path
+Export-ModuleMember -Function Get-Path, Add-Path, Remove-Path, Add-SessionPath
