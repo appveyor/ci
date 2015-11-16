@@ -5,9 +5,9 @@
 $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like '*ethernet*'}).IPAddress
 $port = 3389
 
-if($ip.StartsWith('192.168.')) {
+if($ip.StartsWith('192.168.') -or $ip.StartsWith('10.240.')) {
     # new environment - behind NAT
-    $port = '338' + $ip.split('.')[3].padLeft(2, '0')
+    $port = 33800 + $ip.split('.')[3]
     $password = [Microsoft.Win32.Registry]::GetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", '')
 } else {
     # generate password
