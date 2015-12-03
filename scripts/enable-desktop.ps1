@@ -10,7 +10,7 @@ $zipPath = "$($env:USERPROFILE)\wfreerdp-1.1.zip"
 
 Write-Host "Starting Remote Desktop session..."
 $psw = (get-itemproperty -path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon' -name DefaultPassword).DefaultPassword
-Start-Process "$env:appveyor_build_folder\wfreerdp.exe" -ArgumentList '/v:127.0.0.1','/u:appveyor',"/p:$psw","/size:$screen_resolution" -WindowStyle Hidden
+Start-Process "$env:appveyor_build_folder\wfreerdp.exe" -ArgumentList '/v:127.0.0.1','/u:appveyor',"/p:$psw","/size:$screen_resolution","-themes","-wallpaper","/gdi:sw" -WindowStyle Hidden
 
 Write-Host "Waiting for RDP to connect..."
 Start-Sleep -s 5
