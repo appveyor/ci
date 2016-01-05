@@ -10,7 +10,7 @@ if($env:REPO_CLONE_PROTOCOL -eq 'https') {
     $cloneRepo = "git@github.com:$env:APPVEYOR_REPO_NAME.git"
 }
 
-$timeoutSeconds = 60
+$timeoutSeconds = 180
 if($env:REPO_CLONE_TIMEOUT) {
     $timeoutSeconds = [convert]::ToInt32($env:REPO_CLONE_TIMEOUT)
 }
