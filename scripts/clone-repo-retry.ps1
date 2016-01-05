@@ -20,15 +20,14 @@ if($env:REPO_CLONE_ATTEMPTS) {
     $attempts = [convert]::ToInt32($env:REPO_CLONE_ATTEMPTS)
 }
 
-# delete folder if exists
 while($attempts-- -gt 0) {
     if(Test-Path $cloneFolder) {
         Write-Host "Cleaning up ..."
-        Remove-Item $cloneFolder -Recurse -Force
+        Get-ChildItem -Path $cloneFolder -Include * -Hidden -Recurse | foreach { Remove-Item $_.FullName -Force -Recurse }
+    } else {
+        Write-Host "Creating folder..."
+        New-Item $cloneFolder -ItemType directory | Out-Null        
     }
-
-    Write-Host "Creating folder..."
-    New-Item $cloneFolder -ItemType directory | Out-Null
 
     Write-Host "Clonning..."
 
@@ -46,5 +45,6 @@ while($attempts-- -gt 0) {
         Write-Host "git clone has stuck." -ForegroundColor Yellow
         Write-Host "Terminating git process..."
         cmd /c taskkill /PID $p.Id /F /T
+        Start-Sleep -s 5
     }
 }
