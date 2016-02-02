@@ -5,11 +5,16 @@ set maxRetries=3
 
 :RUN
 %*
-
-rem problem?
-IF NOT ERRORLEVEL 1 GOTO :EOF
-@echo Oops, command exited with code %ERRORLEVEL% - let us try again!
+set LastErrorLevel=%ERRORLEVEL%
+IF %LastErrorLevel% == 0 GOTO :EOF
 set /a retryNumber=%retryNumber%+1
-IF %reTryNumber% LSS %maxRetries% (GOTO :RUN)
+IF %reTryNumber% == %maxRetries% (GOTO :FAILED)
+
+:RETRY
+set /a retryNumberDisp=%retryNumber%+1
+@echo Command "%*" failed with exit code %LastErrorLevel%. Retrying %retryNumberDisp% of %maxRetries%
+GOTO :RUN
+
+: FAILED
 @echo Sorry, we tried running command for %maxRetries% times and all attempts were unsuccessful!
-EXIT /B 1
+EXIT /B %LastErrorLevel%
