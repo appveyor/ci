@@ -8,17 +8,8 @@ $proxies = @{
 
 Write-Host -NoNewline "Enabling AppVeyor HTTP proxy..."
 
-# Enable SSL3
-$origProtocol = [Net.ServicePointManager]::SecurityProtocol
-[Net.ServicePointManager]::SecurityProtocol = 'Tls12'
-
 # get external IP
-$wc = (New-Object Net.WebClient)
-$wc.Headers.Add("User-Agent", "AppVeyor")
-$ip = $wc.DownloadString('https://canhazip.com/').Trim()
-
-# restore original protocol
-[Net.ServicePointManager]::SecurityProtocol = $origProtocol
+$ip = (New-Object Net.WebClient).DownloadString('https://www.appveyor.com/tools/my-ip.aspx').Trim()
 
 $proxy_ip = $proxies[$ip]
 $proxy_port = "8888"
