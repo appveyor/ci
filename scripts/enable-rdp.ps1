@@ -1,6 +1,3 @@
-# Enable SSL3
-[Net.ServicePointManager]::SecurityProtocol = 'Tls12'
-
 # get current IP
 $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like '*ethernet*'}).IPAddress
 $port = 3389
@@ -21,9 +18,7 @@ if($ip.StartsWith('192.168.') -or $ip.StartsWith('10.240.')) {
 }
 
 # get external IP
-$wc = (New-Object Net.WebClient)
-$wc.Headers.Add("User-Agent", "AppVeyor")
-$ip = $wc.DownloadString('https://canhazip.com/').Trim()
+$ip = (New-Object Net.WebClient).DownloadString('https://www.appveyor.com/tools/my-ip.aspx').Trim()
 
 # allow RDP on firewall
 Enable-NetFirewallRule -DisplayName 'Remote Desktop - User Mode (TCP-in)'
