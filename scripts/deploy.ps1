@@ -60,8 +60,8 @@ for($i = 0; $i -lt $artifacts.length; $i++) {
 
     # download artifact
     # -OutFile - is local file name where artifact will be downloaded into
-    Invoke-RestMethod -Method Get -Uri "$apiUrl/buildjobs/$jobId/artifacts/$artifactFileName" `
-         -OutFile $localArtifactPath -Headers $headers
+    Invoke-WebRequest -Method Get -Uri "$apiUrl/buildjobs/$jobId/artifacts/$artifactFileName" `
+         -OutFile $localArtifactPath -Headers @{ "Authorization" = "Bearer $token" }
 
     $artifactsDownloaded++
 }
