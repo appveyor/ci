@@ -43,7 +43,7 @@ $artifactsDownloaded = 0
 for($i = 0; $i -lt $artifacts.length; $i++) {
 
     # filter artifacts if specified
-    if($deployArtifact -and -not ($artifacts[$i].fileName -eq $deployArtifact -or $artifacts[$i].name -eq $deployArtifact)) {
+    if($deployArtifact -and -not ($artifacts[$i].fileName -eq $deployArtifact -or $artifacts[$i].name -eq $deployArtifact  -or [IO.Path]::GetFileName($artifacts[$i].fileName) -eq $deployArtifact)) {
         continue
     }
 
@@ -51,7 +51,8 @@ for($i = 0; $i -lt $artifacts.length; $i++) {
         Write-Host "Downloading build artifacts"
     }
 
-    $artifactFileName = [IO.Path]::GetFileName($artifacts[$i].fileName)
+    $artifactRelativePath = $artifacts[$i].fileName
+    $artifactFileName = [IO.Path]::GetFileName($artifactRelativePath)
 
     Write-Host "[$($i + 1) of $($artifacts.length)] $artifactFileName -> `$env:appveyor_build_folder\$artifactFileName" -ForegroundColor Gray
 
@@ -60,7 +61,7 @@ for($i = 0; $i -lt $artifacts.length; $i++) {
 
     # download artifact
     # -OutFile - is local file name where artifact will be downloaded into
-    Invoke-WebRequest -Method Get -Uri "$apiUrl/buildjobs/$jobId/artifacts/$artifactFileName" `
+    Invoke-WebRequest -Method Get -Uri "$apiUrl/buildjobs/$jobId/artifacts/$artifactRelativePath" `
          -OutFile $localArtifactPath -Headers @{ "Authorization" = "Bearer $token" }
 
     $artifactsDownloaded++
