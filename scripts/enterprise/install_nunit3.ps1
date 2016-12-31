@@ -1,4 +1,4 @@
-﻿Write-Host "Installing NUnit 3.5.0..." -ForegroundColor Cyan -NoNewline
+Write-Host "Installing NUnit 3.5.0..." -ForegroundColor Cyan -NoNewline
 $toolsPath = "$env:SYSTEMDRIVE\Tools"
 $nunitPath = "$env:SYSTEMDRIVE\Tools\NUnit3"
 
@@ -6,7 +6,7 @@ Remove-Item $nunitPath -Recurse -Force -ErrorAction SilentlyContinue
 
 # nunit
 $zipPath = "$($env:TEMP)\NUnit.3.5.0.zip"
-(New-Object Net.WebClient).DownloadFile('https://github.com/nunit/nunit-console/releases/download/3.5/NUnit.3.5.0.zip', $zipPath)
+(New-Object Net.WebClient).DownloadFile('https://github.com/nunit/nunit-console/releases/download/3.5/NUnit.Console-3.5.0.zip', $zipPath)
 7z x $zipPath -y -o"$nunitPath" | Out-Null
 del $zipPath
 
