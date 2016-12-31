@@ -2,7 +2,7 @@
 $toolsPath = "$env:SYSTEMDRIVE\Tools"
 $nunitPath = "$env:SYSTEMDRIVE\Tools\NUnit"
 
-Remove-Item $nunitPath -Recurse -Force
+Remove-Item $nunitPath -Recurse -Force -ErrorAction SilentlyContinue
 
 # nunit
 $zipPath = "$($env:USERPROFILE)\NUnit-2.6.4.zip"
