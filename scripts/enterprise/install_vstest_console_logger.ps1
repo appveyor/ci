@@ -2,7 +2,7 @@
 
 # find VS2017 vstest.console home
 $vs2017ExtensionsPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2017\Community\Common7\IDE\Extensions"
-$vstestConsolePath = (Get-ChildItem -Path $vs2017ExtensionsPath -Filter vstest.console.exe -Recurse)
+$vstestConsolePath = (Get-ChildItem -Path $vs2017ExtensionsPath -Filter vstest.console.exe -Recurse -ErrorAction SilentlyContinue)
 
 $vs2013TestWindowPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio 12.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow"
 $vs2015TestWindowPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow"
@@ -16,11 +16,14 @@ Remove-Path $vs2013TestWindowPath
 Remove-Path $vs2015TestWindowPath
 Remove-Path $vs2017TestWindowPath
 
-# VS 2013
-Remove-Item "$vs2013Path\appveyor.*" -Force
 $zipPath = "$($env:TEMP)\Appveyor.MSTestLogger.zip"
 (New-Object Net.WebClient).DownloadFile('http://www.appveyor.com/downloads/Appveyor.MSTestLogger.zip', $zipPath)
+
+if(Test-Path $vs2013Path) {
+# VS 2013
+Remove-Item "$vs2013Path\appveyor.*" -Force
 7z x $zipPath -y -o"$vs2013Path" | Out-Null
+}
 
 if(Test-Path $vs2015Path) {
     # VS 2015
