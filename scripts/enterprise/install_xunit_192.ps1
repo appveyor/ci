@@ -1,7 +1,7 @@
 ﻿Write-Host "Installing xUnit 1.9.2..." -ForegroundColor Cyan
 $xunitPath = "$env:SYSTEMDRIVE\Tools\xUnit"
 
-Remove-Item $xunitPath -Recurse -Force
+Remove-Item $xunitPath -Recurse -Force -ErrorAction SilentlyContinue
 
 $zipPath = "$($env:USERPROFILE)\xunit-build-1.9.2.zip"
 (New-Object Net.WebClient).DownloadFile('http://www.appveyor.com/downloads/xunit-build-1.9.2.zip', $zipPath)
