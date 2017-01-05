@@ -19,4 +19,3 @@ Remove-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
 New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name DefaultPassword -PropertyType String -Value $pwd' > callme.ps1
 
 .\callme.ps1
-del .\callme.ps1
