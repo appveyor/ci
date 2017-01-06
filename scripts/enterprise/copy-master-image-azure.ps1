@@ -1,4 +1,4 @@
-#Reason to create callme.ps1 file is to make script copy-paste-able to PS windows and still be able to ask for password
+#Reason to create callme.ps1 file is to make script copy-paste-able to PS window and still be able to ask for password
 
 '
 $storageAccountName = Read-Host "Please enter source Storage Account Name"
@@ -8,7 +8,7 @@ $secureStr = Read-Host "Please enter source Storage Account Access Key" -AsSecur
 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStr)
 $storageAccountKey = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
 
-$destinationStorageAccountName = Read-Host "Press Enter to use the same storage account as destination or enter destination storage account here"
+$destinationStorageAccountName = Read-Host "Press Enter to use the same storage account as destination, or type destination storage account name here"
 if ($destinationStorageAccountName) {
     $secureStr = Read-Host "Please enter destination Storage Account Access Key" -AsSecureString 
     #http://stackoverflow.com/questions/21741803/powershell-securestring-encrypt-decrypt-to-plain-text-not-working
