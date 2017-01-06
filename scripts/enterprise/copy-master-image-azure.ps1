@@ -16,7 +16,6 @@ if ($destinationStorageAccountName) {
     $destinationAccountKey = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
 }
 
-
 $srcContainer = "vhds"
 $srcBlob = Read-Host "Please enter source VHD blob name"
 
@@ -41,7 +40,6 @@ if ($destinationStorageAccountName) {
 else {
     $destinationStorageContext = $sourceStorageContext
 }
-
 
 $destContainerExist = Get-AzureStorageContainer -Name $destContainer -Context $destinationStorageContext -ErrorAction SilentlyContinue
 if (!$destContainerExist) {
