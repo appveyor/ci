@@ -1,5 +1,5 @@
 # get current IP
-$ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like '*ethernet*'}).IPAddress
+$ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like 'ethernet*'}).IPAddress
 $port = 3389
 
 if($ip.StartsWith('172.24.')) {
