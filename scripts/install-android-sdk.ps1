@@ -1,3 +1,8 @@
+$AndroidToolPath = "${env:ProgramFiles(x86)}\Android\android-sdk\tools\android.bat"
+if(-not (Test-Path $AndroidToolPath)) {
+    $AndroidToolPath = "$env:localappdata\Android\android-sdk\tools\android.bat"
+}
+
 Function Get-AndroidSDKs() { 
     $output = & $AndroidToolPath list sdk --all 
     $sdks = $output |% { 
