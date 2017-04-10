@@ -1,0 +1,37 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Target Name="XamarinPCLClean" AfterTargets="CoreClean"
+			Condition=" $(TargetFrameworkProfile) != '' And $(TargetFrameworkIdentifier) == '.NETPortable' ">
+		<ItemGroup>
+			<_MdbFile Include="$(TargetPath).mdb" Condition="Exists('$(TargetPath).mdb')" />
+		</ItemGroup>
+		<Delete Files="@(_MdbFile)" TreatErrorsAsWarnings="true" />
+	</Target>
+
+	<Target Name="GetBuiltProjectOutputRecursive" Returns="@(AllBuiltProjectOutputs)" DependsOnTargets="AssignProjectConfiguration;_SplitProjectReferencesByFileExistence;AllProjectOutputGroups">
+
+		<ItemGroup>
+			<_GetBuiltOutputProject Include="@(_MSBuildProjectReferenceExistent)"
+									Condition="$(_BuiltProjectOutputs.Contains('%(_MSBuildProjectReferenceExistent.FullPath)')) == 'false'" />
+		</ItemGroup>
+
+		<PropertyGroup>
+			<!-- Add all the top-level projects that will be added by the @(BuiltProjectOutputGroupKeyOutput) further below -->
+			<_BuiltProjectOutputs>$(_BuiltProjectOutputs)|$(MSBuildProjectFullPath)|@(_MSBuildProjectReferenceExistent->'%(FullPath)', '|')</_BuiltProjectOutputs>
+		</PropertyGroup>	
+	
+	</Target>
+	
+	<Target Name="_CollectPCLPdbFiles" BeforeTargets="_ConvertPdbFiles" AfterTargets="_CollectPdbFiles"
+			DependsOnTargets="GetBuiltProjectOutputRecursive">
+		<ItemGroup>
+			<_ResolvedPdbFiles Include="@(AllBuiltProjectOutputs -> '%(FinalOutputPath)')" 
+				Condition="Exists('%(AllBuiltProjectOutputs.FinalOutputPath)')  AND '%(AllBuiltProjectOutputs.Extension)' == '.dll'"/>
+		</ItemGroup>
+	</Target>
+	<Target Name="_CollectPCLMdbFiles"  BeforeTargets="_CollectMdbFiles" AfterTargets="_CopyMdbFiles">
+		<ItemGroup>
+			<_ResolvedMdbFiles Include="@(AllBuiltProjectOutputs -> '%(FinalOutputPath).mdb')"
+				Condition="Exists('%(AllBuiltProjectOutputs.FinalOutputPath).mdb')" />
+		</ItemGroup>
+	</Target>
+</Project>
