@@ -28,13 +28,13 @@ if (!$destBlob) {$destBlob = $destBlobDefault}
 
 # copy master blob to images
 $sourceStorageContext = New-AzureStorageContext `
-    –StorageAccountName $storageAccountName `
+    -StorageAccountName $storageAccountName `
     -StorageAccountKey $storageAccountKey
  
 if ($destinationStorageAccountName) {
  
     $destinationStorageContext = New-AzureStorageContext `
-        –StorageAccountName $destinationStorageAccountName `
+        -StorageAccountName $destinationStorageAccountName `
         -StorageAccountKey $destinationAccountKey
 }
 else {
