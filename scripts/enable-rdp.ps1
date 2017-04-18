@@ -7,16 +7,15 @@ $password = ''
 if($env:appveyor_rdp_password) {
     # take from environment variable
     $password = $env:appveyor_rdp_password
+    
+    # change password
+    $objUser = [ADSI]("WinNT://$($env:computername)/appveyor")
+    $objUser.SetPassword($password)
+    [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
 } else {
-    # generate password
-    $randomObj = New-Object System.Random
-    1..12 | ForEach { $password = $password + [char]$randomObj.next(33,126) }
+    # get existing password
+    $password = [Microsoft.Win32.Registry]::GetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", '')
 }
-
-# change password
-$objUser = [ADSI]("WinNT://$($env:computername)/appveyor")
-$objUser.SetPassword($password)
-[Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
 
 if($ip.StartsWith('172.24.')) {
     $port = 33800 + ($ip.split('.')[2] - 16) * 256 + $ip.split('.')[3]
