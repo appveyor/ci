@@ -21,7 +21,7 @@ if($ip.StartsWith('172.24.')) {
     $port = 33800 + ($ip.split('.')[2] - 16) * 256 + $ip.split('.')[3]
 } elseif ($ip.StartsWith('192.168.') -or $ip.StartsWith('10.240.')) {
     # new environment - behind NAT
-    $port = 33800 + $ip.split('.')[3]
+    $port = 33800 + ($ip.split('.')[2] - 0) * 256 + $ip.split('.')[3]
 }
 
 # get external IP
