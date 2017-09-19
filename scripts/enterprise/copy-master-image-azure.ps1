@@ -47,7 +47,7 @@ if (!$destContainerExist) {
 }
 
 $vhdBlob = Start-AzureStorageBlobCopy `
-    -AbsoluteUri $srcBlobUri`
+    -AbsoluteUri $srcBlobUri `
     -DestContainer $destContainer `
     -DestBlob $destBlob `
     -DestContext $destinationStorageContext
