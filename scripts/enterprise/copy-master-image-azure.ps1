@@ -16,13 +16,12 @@ if ($destinationStorageAccountName) {
     $destinationAccountKey = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
 }
 
-$srcContainer = "vhds"
-$srcBlob = Read-Host "Please enter source VHD blob name"
+$srcBlobUri = Read-Host "Please enter source VHD URI"
 
 $destContainer = Read-Host "Please enter destination container name or press Enter for default (images)"
 if (!$destContainer) {$destContainer = "images"}
 
-$destBlobDefault = "master" + (Get-Date -Format "yyyy-MM-dd") + ".vhd"
+$destBlobDefault = "master-" + (Get-Date -Format "yyyy-MM-dd") + ".vhd"
 $destBlob = Read-Host "Please enter target master VHD blob name press Enter for default ($destBlobDefault)"
 if (!$destBlob) {$destBlob = $destBlobDefault}
 
@@ -48,9 +47,7 @@ if (!$destContainerExist) {
 }
 
 $vhdBlob = Start-AzureStorageBlobCopy `
-    -SrcContainer $srcContainer `
-    -SrcBlob $srcBlob `
-    -SrcContext $sourceStorageContext `
+    -AbsoluteUri $srcBlobUri`
     -DestContainer $destContainer `
     -DestBlob $destBlob `
     -DestContext $destinationStorageContext
