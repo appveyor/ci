@@ -4,4 +4,3 @@ if (Get-Service Appveyor.HostAgent -ErrorAction Ignore) {
 }
 Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Appveyor.HostAgent" `
 	-Value "C:\Program Files\AppVeyor\HostAgent\Appveyor.HostAgent.exe"
- 
