@@ -1,3 +1,15 @@
+function ChangePassword($password) {
+  $objUser = [ADSI]("WinNT://$($env:computername)/appveyor")
+  $objUser.SetPassword($password)
+  $objUser.CommitChanges()
+}
+
+function ValidatePassword($password) {
+  Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+  $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:computername)
+  $DS.ValidateCredentials("appveyor", $password)
+}
+
 # get current IP
 $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like 'ethernet*'}).IPAddress
 $port = 3389
@@ -8,10 +20,16 @@ if($env:appveyor_rdp_password) {
     # take from environment variable
     $password = $env:appveyor_rdp_password
     
-    # change password
-    $objUser = [ADSI]("WinNT://$($env:computername)/appveyor")
-    $objUser.SetPassword($password)
-    $objUser.CommitChanges()
+    # change password. Best effort to ensure password change applied.
+    $count = 0
+    $valid = $false
+    do {
+      for ($i=0; $i -le 3; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
+      $valid = ValidatePassword($password)
+      $count++
+      if(!$valid) {Start-Sleep -Milliseconds 100}      
+    } while(!$valid -and ($count -lt 3))
+    
     [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
 } else {
     # get existing password
