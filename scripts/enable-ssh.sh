@@ -1,9 +1,14 @@
 #!/bin/bash -e
 
-LOCK_FILE=$HOME/build.lock
+USER_NAME=appveyor
+LOCK_FILE="${HOME}/build.lock"
+USERKEY="${HOME}/.ssh/userkey"
+
+YELLOW='\033[0;33m'
+NC='\033[0m'
 
 # open 22 port for management network interface
-sudo ufw allow OpenSSH
+sudo ufw allow OpenSSH > /dev/null 2>&1
 
 # get external IP address via https://www.appveyor.com/tools/my-ip.aspx
 EXT_IP=$(curl -sf https://www.appveyor.com/tools/my-ip.aspx)
@@ -14,16 +19,26 @@ IFS='.' read -r -a INT_IP_ARR <<< "$INT_IP"
 PORT=$(( 22000 + (${INT_IP_ARR[2]} - 0) * 256 + ${INT_IP_ARR[3]} ))
 
 # add ssh key (if set) to authorized_keys
-if [[ -n $APPVEYOR_SSH_KEY ]]; then
+if [[ -n "${APPVEYOR_SSH_KEY}" ]]; then
     (
         echo "#Added by Appveyor Build Agent"
-        echo $APPVEYOR_SSH_KEY
-    ) >> $HOME/.ssh/authorized_keys
-    chmod 600 $HOME/.ssh/authorized_keys
+        echo "${APPVEYOR_SSH_KEY}"
+    ) >> "${HOME}/.ssh/authorized_keys"
+    chmod 600 "${HOME}/.ssh/authorized_keys"
+    echo "${APPVEYOR_SSH_KEY}" >"$USERKEY"
+    USERKEY_MD5=$(ssh-keygen -E md5 -lf "${USERKEY}" | cut -f 2 -d" ")
+    USERKEY_SHA256=$(ssh-keygen -lf "${USERKEY}" | cut -f 2 -d" ")
 fi
 
 # print out connection command
-echo "connect to ${EXT_IP} port $PORT"
+echo "Connect to ${EXT_IP} port $PORT with ${USER_NAME} user:"
+echo -e "${YELLOW}    ssh ${USER_NAME}@${EXT_IP} -p ${PORT}${NC}"
+if [[ -n "${USERKEY_MD5}" ]]; then
+    echo ""
+    echo "RSA key fingerprint:"
+    echo "    ${USERKEY_SHA256}"
+    echo "    ${USERKEY_MD5}"
+fi
 
 if [[ -n "$APPVEYOR_SSH_BLOCK" ]] && $APPVEYOR_SSH_BLOCK; then
     # create $HOME/build.lock file if we need to block build process.
@@ -32,4 +47,5 @@ if [[ -n "$APPVEYOR_SSH_BLOCK" ]] && $APPVEYOR_SSH_BLOCK; then
     while [ -f "${LOCK_FILE}" ]; do
         sleep 1
     done
+    echo "SSH session has been finished."
 fi
