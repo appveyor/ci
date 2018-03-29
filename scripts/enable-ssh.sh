@@ -3,6 +3,7 @@
 USER_NAME=appveyor
 LOCK_FILE="${HOME}/build.lock"
 USERKEY="${HOME}/.ssh/userkey"
+HOSTKEY=/etc/ssh/ssh_host_ecdsa_key.pub
 
 YELLOW='\033[0;33m'
 NC='\033[0m'
@@ -39,8 +40,14 @@ if [[ -n "${USERKEY_MD5}" ]]; then
     echo "    ${USERKEY_SHA256}"
     echo "    ${USERKEY_MD5}"
 fi
+if [[ -f "${HOSTKEY}" ]]; then
+    echo ""
+    echo "Server host key fingerprint:"
+    HOSTKEY_SHA256=$(ssh-keygen -lf ${HOSTKEY} | cut -f 2 -d" ")
+    echo "    ${HOSTKEY_SHA256}"
+fi
 
-if [[ -n "$APPVEYOR_SSH_BLOCK" ]] && $APPVEYOR_SSH_BLOCK; then
+if [[ -n "${APPVEYOR_SSH_BLOCK}" ]] && ${APPVEYOR_SSH_BLOCK}; then
     # create $HOME/build.lock file if we need to block build process.
     touch "${LOCK_FILE}"
     # wait until $HOME/build.lock deleted by user.
