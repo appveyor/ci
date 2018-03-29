@@ -2,11 +2,23 @@
 
 USER_NAME=appveyor
 LOCK_FILE="${HOME}/build.lock"
-USERKEY="${HOME}/.ssh/userkey"
 HOSTKEY=/etc/ssh/ssh_host_ecdsa_key.pub
 
 YELLOW='\033[0;33m'
 NC='\033[0m'
+
+if [[ -z "${APPVEYOR_SSH_KEY}" ]]; then
+    echo "APPVEYOR_SSH_KEY variable is not defined!"
+    echo "Please read https://www.appveyor.com/docs/getting-started-with-appveyor-for-linux/"
+    exit 1
+fi
+
+if ! ssh-keygen -E md5 -lf /dev/stdin <<< "${APPVEYOR_SSH_KEY}"; then
+    echo "APPVEYOR_SSH_KEY contain invalid key!"
+    exit 2
+fi
+
+trap 'sudo ufw deny OpenSSH >/dev/null' EXIT SIGHUP SIGINT SIGQUIT SIGTERM ERR
 
 # open 22 port for management network interface
 sudo ufw allow OpenSSH > /dev/null 2>&1
@@ -20,16 +32,13 @@ IFS='.' read -r -a INT_IP_ARR <<< "$INT_IP"
 PORT=$(( 22000 + (${INT_IP_ARR[2]} - 0) * 256 + ${INT_IP_ARR[3]} ))
 
 # add ssh key (if set) to authorized_keys
-if [[ -n "${APPVEYOR_SSH_KEY}" ]]; then
-    (
-        echo "#Added by Appveyor Build Agent"
-        echo "${APPVEYOR_SSH_KEY}"
-    ) >> "${HOME}/.ssh/authorized_keys"
-    chmod 600 "${HOME}/.ssh/authorized_keys"
-    echo "${APPVEYOR_SSH_KEY}" >"$USERKEY"
-    USERKEY_MD5=$(ssh-keygen -E md5 -lf "${USERKEY}" | cut -f 2 -d" ")
-    USERKEY_SHA256=$(ssh-keygen -lf "${USERKEY}" | cut -f 2 -d" ")
-fi
+(
+    echo "#Added by Appveyor Build Agent"
+    echo "${APPVEYOR_SSH_KEY}"
+) >> "${HOME}/.ssh/authorized_keys"
+chmod 600 "${HOME}/.ssh/authorized_keys"
+USERKEY_MD5=$(ssh-keygen -E md5 -lf /dev/stdin <<<"${APPVEYOR_SSH_KEY}" | cut -f 2 -d" ")
+USERKEY_SHA256=$(ssh-keygen -lf /dev/stdin <<< "${APPVEYOR_SSH_KEY}" | cut -f 2 -d" ")
 
 # print out connection command
 echo "Connect to ${EXT_IP} port $PORT with ${USER_NAME} user:"
