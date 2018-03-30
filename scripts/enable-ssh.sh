@@ -13,7 +13,7 @@ if [[ -z "${APPVEYOR_SSH_KEY}" ]]; then
     exit 1
 fi
 
-if ! ssh-keygen -E md5 -lf /dev/stdin <<< "${APPVEYOR_SSH_KEY}"; then
+if ! ssh-keygen -E md5 -lf /dev/stdin <<< "${APPVEYOR_SSH_KEY}" >/dev/null; then
     echo "APPVEYOR_SSH_KEY contain invalid key!"
     exit 2
 fi
@@ -59,6 +59,7 @@ fi
 if [[ -n "${APPVEYOR_SSH_BLOCK}" ]] && ${APPVEYOR_SSH_BLOCK}; then
     # create $HOME/build.lock file if we need to block build process.
     touch "${LOCK_FILE}"
+    echo "Before leaving SSH session run 'rm ~/build.lock' command to continue the build."
     # wait until $HOME/build.lock deleted by user.
     while [ -f "${LOCK_FILE}" ]; do
         sleep 1
