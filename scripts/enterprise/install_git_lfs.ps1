@@ -1,7 +1,7 @@
 Write-Host "Installing Git LFS..." -ForegroundColor Cyan
 
 # delete existing Git LFS
-del 'C:\Program Files\Git\mingw64\bin\git-lfs.exe'
+del 'C:\Program Files\Git\mingw64\bin\git-lfs.exe' -ErrorAction SilentlyContinue
 
 $exePath = "$env:TEMP\git-lfs-windows-2.2.1.exe"
 
