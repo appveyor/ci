@@ -32,6 +32,7 @@ IFS='.' read -r -a INT_IP_ARR <<< "$INT_IP"
 PORT=$(( 22000 + (${INT_IP_ARR[2]} - 0) * 256 + ${INT_IP_ARR[3]} ))
 
 # add ssh key (if set) to authorized_keys
+mkdir -p ${HOME}/.ssh
 (
     echo "#Added by Appveyor Build Agent"
     echo "${APPVEYOR_SSH_KEY}"
