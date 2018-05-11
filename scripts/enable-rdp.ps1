@@ -10,7 +10,7 @@ function ValidatePassword($password) {
   $DS.ValidateCredentials("appveyor", $password)
 }
 
-if(!$isLinux) {
+if($isLinux) {
   Write-Warning "RDP is not supported on Linux. Please use SSH (https://www.appveyor.com/docs/how-to/ssh-to-build-worker/)."
   return
 }
