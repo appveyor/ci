@@ -10,6 +10,11 @@ function ValidatePassword($password) {
   $DS.ValidateCredentials("appveyor", $password)
 }
 
+if($isLinux) {
+  Write-Warning "RDP access is not supported on Linux. Please use SSH (https://www.appveyor.com/docs/how-to/ssh-to-build-worker/)."
+  return
+}
+
 # get current IP
 $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like 'ethernet*'}).IPAddress
 $port = 3389
