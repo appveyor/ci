@@ -11,7 +11,7 @@ function ValidatePassword($password) {
 }
 
 if($isLinux) {
-  Write-Warning "RDP is not supported on Linux. Please use SSH (https://www.appveyor.com/docs/how-to/ssh-to-build-worker/)."
+  Write-Warning "RDP access is not supported on Linux. Please use SSH (https://www.appveyor.com/docs/how-to/ssh-to-build-worker/)."
   return
 }
 
