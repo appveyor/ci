@@ -2,11 +2,11 @@
 $installerFileName = "$($env:TEMP)\AppveyorBuildAgent.msi"
  
 $process = Get-Process -Name 'Appveyor.BuildAgent.Service' -ErrorAction SilentlyContinue
-if($process) {
+if($process) {scripts/enterprise/install_appveyor_build_agent.ps1
     $process | Stop-Process -Force
 }
 $process = Get-Process -Name 'Appveyor.BuildAgent.Interactive' -ErrorAction SilentlyContinue
-if($process) {
+if($process) {scripts/enterprise/install_appveyor_build_agent.ps1
     $process | Stop-Process -Force
 }
  
