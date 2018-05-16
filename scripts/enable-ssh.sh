@@ -9,7 +9,7 @@ NC='\033[0m'
 
 if [[ -z "${APPVEYOR_SSH_KEY}" ]]; then
     echo "APPVEYOR_SSH_KEY variable is not defined!"
-    echo "Please read https://www.appveyor.com/docs/getting-started-with-appveyor-for-linux/"
+    echo "Please read https://www.appveyor.com/docs/how-to/ssh-to-build-worker/"
     exit 1
 fi
 
@@ -58,12 +58,12 @@ if [[ -f "${HOSTKEY}" ]]; then
 fi
 
 if [[ -n "${APPVEYOR_SSH_BLOCK}" ]] && ${APPVEYOR_SSH_BLOCK}; then
-    # create $HOME/build.lock file if we need to block build process.
+    # create "lock" file.
     touch "${LOCK_FILE}"
-    echo "Before leaving SSH session run 'rm ~/build.lock' command to continue the build."
+    echo "Build paused. To resume it, open a SSH session to run '${YELLOW}rm ~/build.lock${NC}' command."
     # wait until $HOME/build.lock deleted by user.
     while [ -f "${LOCK_FILE}" ]; do
         sleep 1
     done
-    echo "SSH session has been finished."
+    echo "Build lock has been deleted. Resuming build."
 fi
