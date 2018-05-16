@@ -29,7 +29,7 @@ while($attempts-- -gt 0) {
         New-Item $cloneFolder -ItemType directory | Out-Null        
     }
 
-    Write-Host "Clonning..."
+    Write-Host "Cloning..."
 
     $si = new-object System.Diagnostics.ProcessStartInfo
     $si.UseShellExecute = $false
