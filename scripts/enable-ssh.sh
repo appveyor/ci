@@ -61,9 +61,9 @@ if [[ -n "${APPVEYOR_SSH_BLOCK}" ]] && ${APPVEYOR_SSH_BLOCK}; then
     # create "lock" file.
     touch "${LOCK_FILE}"
     echo -e "Build paused. To resume it, open a SSH session to run '${YELLOW}rm "${LOCK_FILE}"${NC}' command."
-    # wait until $HOME/build.lock deleted by user.
+    # wait until "lock" file is deleted by user.
     while [ -f "${LOCK_FILE}" ]; do
         sleep 1
     done
-    echo "Build lock has been deleted. Resuming build."
+    echo "Build lock file has been deleted. Resuming build."
 fi
