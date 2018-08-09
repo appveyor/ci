@@ -14,7 +14,7 @@ if ($dd) {
 
 # Remove-Path "C:\Program Files\Docker\Docker\resources\bin"
 
-Write-Host "Downloading Docker CE daemon..." -ForegroundColor Cyan
+Write-Host "Downloading Docker CE daemon"
 
 $destPath = "C:\Program Files\Docker\DockerCE"
 $zipPath = "$env:TEMP\docker-ce.zip"
@@ -23,3 +23,5 @@ $zipPath = "$env:TEMP\docker-ce.zip"
 del $zipPath
 
 Add-Path "$destPath\docker"
+
+Write-Host "Docker CE installed" -ForegroundColor Green
