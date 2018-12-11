@@ -106,9 +106,9 @@ function Start-NodeJsInstallation {
 
     $v = Get-Version $version
     if ($v.Major -eq 0 -or $v.Major -ge 4) {
-        $features = 'NodeRuntime,NodePerfCtrSupport,NodeEtwSupport,npm'
+        $features = 'NodeRuntime,npm'
     } else {
-        $features = 'NodeRuntime,NodeAlias,NodePerfCtrSupport,NodeEtwSupport,npm'
+        $features = 'NodeRuntime,NodeAlias,npm'
     }
 
     Write-Host "Installing $(ProductName($version)) v$version ($bitness)..."
