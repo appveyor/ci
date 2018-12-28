@@ -8,20 +8,20 @@ function Get-Version([string]$str) {
         number = 0
     }
 
-    if($versionDigits.Length -gt 0) {
+    if ($versionDigits.Length -gt 0) {
         $version.major = [int]$versionDigits[0]
     }
-    if($versionDigits.Length -gt 1) {
+    if ($versionDigits.Length -gt 1) {
         $version.minor = [int]$versionDigits[1]
     }
-    if($versionDigits.Length -gt 2) {
+    if ($versionDigits.Length -gt 2) {
         $version.build = [int]$versionDigits[2]
     }
-    if($versionDigits.Length -gt 3) {
+    if ($versionDigits.Length -gt 3) {
         $version.revision = [int]$versionDigits[3]
     }
 
-    for($i = 0; $i -lt $versionDigits.Length; $i++) {
+    for ($i = 0; $i -lt $versionDigits.Length; $i++) {
         $version.number += [long]$versionDigits[$i] -shl 16 * (3 - $i)
     }
 
@@ -31,7 +31,7 @@ function Get-Version([string]$str) {
 function Get-NodeJsInstallPackage {
     param
     (
-	    [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true)]
         [string]$version,
 
         [Parameter(Mandatory=$false)]
@@ -39,21 +39,21 @@ function Get-NodeJsInstallPackage {
     )
 
     $v = Get-Version $version
-    
+
     if ($v.Major -ge 4 -and $bitness -eq 'x86') {
-        $packageUrl = "http://nodejs.org/dist/v$version/node-v$version-x86.msi"
+        $packageUrl = "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
     } elseif ($v.Major -ge 4 -and $bitness -eq 'x64') {
-        $packageUrl = "http://nodejs.org/dist/v$version/node-v$version-x64.msi"
+        $packageUrl = "https://nodejs.org/dist/v$version/node-v$version-x64.msi"
     } elseif ($v.Major -eq 0 -and $bitness -eq 'x86') {
-        $packageUrl = "http://nodejs.org/dist/v$version/node-v$version-x86.msi"
+        $packageUrl = "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
     } elseif ($v.Major -ge 1 -and $bitness -eq 'x86') {
         $packageUrl = "https://iojs.org/dist/v$version/iojs-v$version-x86.msi"
     } elseif ($v.Major -eq 0) {
-        $packageUrl = "http://nodejs.org/dist/v$version/x64/node-v$version-x64.msi"
+        $packageUrl = "https://nodejs.org/dist/v$version/x64/node-v$version-x64.msi"
     } elseif ($v.Major -ge 1) {
-        $packageUrl = "https://iojs.org/dist/v$version/iojs-v$version-x64.msi"
+        $packageUrl = "httpss://iojs.org/dist/v$version/iojs-v$version-x64.msi"
     }
-    
+
     $packageFileName = Join-Path ([IO.Path]::GetTempPath()) $packageUrl.Substring($packageUrl.LastIndexOf('/') + 1)
     (New-Object Net.WebClient).DownloadFile($packageUrl, $packageFileName)
     return $packageFileName
@@ -61,11 +61,11 @@ function Get-NodeJsInstallPackage {
 
 function Get-InstalledNodeJsVersion() {
     $nodePath = (cmd /c where node.exe)
-    if(-not $nodePath) {
-       $nodePath = (cmd /c where iojs.exe) 
+    if (-not $nodePath) {
+       $nodePath = (cmd /c where iojs.exe)
     }
 
-    if($nodePath) {
+    if ($nodePath) {
         $bitness = 'x64'
         if ($nodePath.indexOf('(x86)') -ne -1) {
             $bitness = 'x86'
@@ -82,7 +82,7 @@ function Get-InstalledNodeJsVersion() {
 function Remove-NodeJsInstallation {
     param
     (
-	    [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true)]
         [string]$version,
 
         [Parameter(Mandatory=$true)]
@@ -97,7 +97,7 @@ function Remove-NodeJsInstallation {
 function Start-NodeJsInstallation {
     param
     (
-	    [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true)]
         [string]$version,
 
         [Parameter(Mandatory=$false)]
@@ -106,9 +106,9 @@ function Start-NodeJsInstallation {
 
     $v = Get-Version $version
     if ($v.Major -eq 0 -or $v.Major -ge 4) {
-        $features = 'NodeRuntime,NodePerfCtrSupport,NodeEtwSupport,npm'
+        $features = 'NodeRuntime,npm'
     } else {
-        $features = 'NodeRuntime,NodeAlias,NodePerfCtrSupport,NodeEtwSupport,npm' 
+        $features = 'NodeRuntime,NodeAlias,npm'
     }
 
     Write-Host "Installing $(ProductName($version)) v$version ($bitness)..."
@@ -119,7 +119,7 @@ function Start-NodeJsInstallation {
 function Update-NodeJsInstallation {
     param
     (
-	    [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true)]
         [string]$version,
 
         [Parameter(Mandatory=$false)]
@@ -128,10 +128,9 @@ function Update-NodeJsInstallation {
 
     $installedVersion = Get-InstalledNodeJsVersion
 
-    if($installedVersion -eq $null -or $installedVersion.version -ne $version -or $installedVersion.bitness -ne $bitness)
-    {
+    if ($installedVersion -eq $null -or $installedVersion.version -ne $version -or $installedVersion.bitness -ne $bitness) {
         Write-Host "Updating $(ProductName($version)) v$version ($bitness)"
-        if($installedVersion) {
+        if ($installedVersion) {
             Remove-NodeJsInstallation $installedVersion.version $installedVersion.bitness
         }
         Start-NodeJsInstallation $version $bitness
@@ -142,9 +141,9 @@ function Get-NodeJsLatestBuild([string]$majorVersion) {
     # fetch available distros
     $v = Get-Version $majorVersion
     if ($v.Major -eq 0 -or $v.Major -ge 4) {
-        $content = (New-Object Net.WebClient).DownloadString('http://nodejs.org/dist/')
+        $content = (New-Object Net.WebClient).DownloadString('https://nodejs.org/dist/')
     } else {
-        $content = (New-Object Net.WebClient).DownloadString('https://iojs.org/dist/') 
+        $content = (New-Object Net.WebClient).DownloadString('https://iojs.org/dist/')
     }
 
     # parse versions and find the latest
@@ -152,15 +151,14 @@ function Get-NodeJsLatestBuild([string]$majorVersion) {
         | % {$_.matches} | % { $_.groups[1].value } `
         | Where-Object {"$_.".StartsWith("$majorVersion.") })
 
-    if($versions.Count -eq 0) {
+    if ($versions.Count -eq 0) {
         return $null
-    }
-    elseif($versions.indexOf('.') -ne -1) {
+    } elseif ($versions.indexOf('.') -ne -1) {
         return $versions
     } else {
         $maxVersion = $versions[0]
-        for($i = 0; $i -lt $versions.Count; $i++) {
-            if((Get-Version $versions[$i]).number -gt (Get-Version $maxVersion).number) {
+        for ($i = 0; $i -lt $versions.Count; $i++) {
+            if ((Get-Version $versions[$i]).number -gt (Get-Version $maxVersion).number) {
                 $maxVersion = $versions[$i]
             }
         }

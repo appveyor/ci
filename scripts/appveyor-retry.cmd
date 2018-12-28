@@ -6,15 +6,15 @@ set maxRetries=3
 :RUN
 %*
 set LastErrorLevel=%ERRORLEVEL%
-IF %LastErrorLevel% == 0 GOTO :EOF
+if %LastErrorLevel% == 0 goto :EOF
 set /a retryNumber=%retryNumber%+1
-IF %reTryNumber% == %maxRetries% (GOTO :FAILED)
+if %reTryNumber% == %maxRetries% (goto FAILED)
 
 :RETRY
 set /a retryNumberDisp=%retryNumber%+1
 @echo Command "%*" failed with exit code %LastErrorLevel%. Retrying %retryNumberDisp% of %maxRetries%
-GOTO :RUN
+goto RUN
 
-: FAILED
-@echo Sorry, we tried running command for %maxRetries% times and all attempts were unsuccessful!
-EXIT /B %LastErrorLevel%
+:FAILED
+@echo Sorry, we tried running the command for %maxRetries% times and all attempts were unsuccessful!
+exit /B %LastErrorLevel%
