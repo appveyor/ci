@@ -29,7 +29,7 @@ if($env:appveyor_rdp_password) {
     $count = 0
     $valid = $false
     do {
-      for ($i=0; $i -le 3; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
+      for ($i=0; $i -le 30; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
       $valid = ValidatePassword($password)
       $count++
       if(!$valid) {Start-Sleep -Milliseconds 100}      
