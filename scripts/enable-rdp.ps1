@@ -8,7 +8,10 @@ function ValidatePassword($password) {
   $Error.Clear()
   net use \\$env:COMPUTERNAME /user:appveyor $password 2>&1>null
   net use \\$env:COMPUTERNAME /delete 2>&1>null
-  return $?
+  [bool]$retval = $?
+  Write-host "password test: $retval"
+  Remove-Item $env:APPVEYOR_BUILD_FOLDER -Force -Recurse -ErrorAction Ignore
+  return $retval
 }
 
 if((Test-Path variable:islinux) -and $isLinux) {
