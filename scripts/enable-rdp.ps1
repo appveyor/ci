@@ -7,7 +7,9 @@ function ChangePassword($password) {
 function ValidatePassword($password) {
   Add-Type -AssemblyName System.DirectoryServices.AccountManagement
   $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:computername)
-  $DS.ValidateCredentials("appveyor", $password)
+  [bool]$retval = $DS.ValidateCredentials("appveyor", $password)
+  Write-host "ValidateCredentials results: $retval"
+  return $retval
 }
 
 if((Test-Path variable:islinux) -and $isLinux) {
@@ -32,7 +34,7 @@ if($env:appveyor_rdp_password) {
       for ($i=0; $i -le 30; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
       $valid = ValidatePassword($password)
       $count++
-      if(!$valid) {Write-host "Password was not reset"; Start-Sleep 5}      
+      if(!$valid) {Write-host "Password was not reset. Next attempt: $count"; Start-Sleep 5}      
     } while(!$valid -and ($count -lt 10))
     
     [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
