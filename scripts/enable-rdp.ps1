@@ -5,11 +5,10 @@ function ChangePassword($password) {
 }
 
 function ValidatePassword($password) {
-  Add-Type -AssemblyName System.DirectoryServices.AccountManagement
-  $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:computername)
-  [bool]$retval = $DS.ValidateCredentials("appveyor", $password)
-  Write-host "ValidateCredentials results: $retval"
-  return $retval
+  $Error.Clear()
+  net use \\$env:COMPUTERNAME /user:appveyor $password 2>&1>null
+  net use \\$env:COMPUTERNAME /delete 2>&1>null
+  return $?
 }
 
 if((Test-Path variable:islinux) -and $isLinux) {
