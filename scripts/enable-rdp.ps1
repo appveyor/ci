@@ -32,8 +32,8 @@ if($env:appveyor_rdp_password) {
       for ($i=0; $i -le 30; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
       $valid = ValidatePassword($password)
       $count++
-      if(!$valid) {Start-Sleep -Milliseconds 100}      
-    } while(!$valid -and ($count -lt 3))
+      if(!$valid) {Write-host "Password was not reset"; Start-Sleep 5}      
+    } while(!$valid -and ($count -lt 10))
     
     [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
 } else {
