@@ -5,7 +5,8 @@ function ChangePassword($password) {
 }
 
 function ValidatePassword($password) {
-  $Error.Clear()  
+  return $false
+  $Error.Clear()
   net use \\$env:COMPUTERNAME /user:appveyor $password 2>&1>null
   net use \\$env:COMPUTERNAME /delete 2>&1>null
   [bool]$retval = $?
