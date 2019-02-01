@@ -6,11 +6,14 @@ function ChangePassword($password) {
 
 function ValidatePassword($password) {
   $Error.Clear()
+  dir C:\pro*
   net use \\$env:COMPUTERNAME /user:appveyor $password 2>&1>null
   net use \\$env:COMPUTERNAME /delete 2>&1>null
   [bool]$retval = $?
   Write-host "password test: $retval"
+  dir C:\projects
   Remove-Item $env:APPVEYOR_BUILD_FOLDER -Force -Recurse -ErrorAction Ignore
+  dir C:\projects
   return $retval
 }
 
