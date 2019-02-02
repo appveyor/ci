@@ -4,15 +4,13 @@ function ChangePassword($password) {
   $objUser.CommitChanges()
 }
 
-function ValidatePassword($password) {
-  return $false
-  $Error.Clear()
-  net use \\$env:COMPUTERNAME /user:appveyor $password 2>&1>null
-  net use \\$env:COMPUTERNAME /delete 2>&1>null
-  [bool]$retval = $?
-  Write-host "password test: $retval"  
-  Remove-Item C:\projects -Force -Recurse -ErrorAction Ignore  
-  return $retval
+function WaitInitialPasswordChange() {
+  $end = (Get-Date).AddMinutes(1)
+  $changed = $false
+  while (!$changed  -and  ($end -gt (Get-Date))) {
+    $changed =  (Get-ItemProperty 'HKLM:\SOFTWARE\Appveyor\Build Agent\State' -Name AgentPasswordChanged -ErrorAction Ignore).AgentPasswordChanged -eq "true"
+    if (!$changed) {Write-host "."; Sleep 5}
+  }
 }
 
 if((Test-Path variable:islinux) -and $isLinux) {
@@ -28,18 +26,9 @@ $port = 3389
 $password = ''
 if($env:appveyor_rdp_password) {
     # take from environment variable
-    $password = $env:appveyor_rdp_password
-    
-    # change password. Best effort to ensure password change applied.
-    $count = 0
-    $valid = $false
-    do {
-      for ($i=0; $i -le 30; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
-      $valid = ValidatePassword($password)
-      $count++
-      if(!$valid) {Write-host "Password was not reset. Next attempt: $count"; Start-Sleep 5}      
-    } while(!$valid -and ($count -lt 10))
-    
+    $password = $env:appveyor_rdp_password       
+    WaitInitialPasswordChange()
+    ChangePassword($password)   
     [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
 } else {
     # get existing password
