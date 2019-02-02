@@ -4,10 +4,10 @@ function ChangePassword($password) {
   $objUser.CommitChanges()
 }
 
-function ValidatePassword($password) {
-  Add-Type -AssemblyName System.DirectoryServices.AccountManagement
-  $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$env:computername)
-  $DS.ValidateCredentials("appveyor", $password)
+function SleepIfBeforeClone() {
+  if (!(Get-ItemProperty 'HKLM:\SOFTWARE\Appveyor\Build Agent\State' -Name GetSources -ErrorAction Ignore).GetSources -eq "true") {
+  sleep 30
+  }   
 }
 
 if((Test-Path variable:islinux) -and $isLinux) {
@@ -23,18 +23,9 @@ $port = 3389
 $password = ''
 if($env:appveyor_rdp_password) {
     # take from environment variable
-    $password = $env:appveyor_rdp_password
-    
-    # change password. Best effort to ensure password change applied.
-    $count = 0
-    $valid = $false
-    do {
-      for ($i=0; $i -le 30; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
-      $valid = ValidatePassword($password)
-      $count++
-      if(!$valid) {Start-Sleep -Milliseconds 100}      
-    } while(!$valid -and ($count -lt 3))
-    
+    $password = $env:appveyor_rdp_password       
+    SleepIfBeforeClone
+    for ($i=0; $i -le 30; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
     [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
 } else {
     # get existing password
