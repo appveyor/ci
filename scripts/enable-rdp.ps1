@@ -27,8 +27,8 @@ $password = ''
 if($env:appveyor_rdp_password) {
     # take from environment variable
     $password = $env:appveyor_rdp_password       
-    WaitInitialPasswordChange()
-    ChangePassword($password)   
+    WaitInitialPasswordChange
+    ChangePassword -password $password
     [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
 } else {
     # get existing password
