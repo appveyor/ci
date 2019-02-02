@@ -4,15 +4,10 @@ function ChangePassword($password) {
   $objUser.CommitChanges()
 }
 
-function WaitInitialPasswordChange() {
-  $end = (Get-Date).AddMinutes(1)
-  $changed = $false
-  while (!$changed  -and  ($end -gt (Get-Date))) {
-    Write-host "waiting for password change"
-    Get-ItemProperty 'HKLM:\SOFTWARE\Appveyor\Build Agent\State'
-    $changed =  (Get-ItemProperty 'HKLM:\SOFTWARE\Appveyor\Build Agent\State' -Name AgentPasswordChanged -ErrorAction Ignore).AgentPasswordChanged -eq "true"
-    if (!$changed) {Write-host "."; Sleep 5}
-  }
+function SleepIfBeforeClone() {
+  if (!(Get-ItemProperty 'HKLM:\SOFTWARE\Appveyor\Build Agent\State' -Name GetSources -ErrorAction Ignore).GetSources -eq "true") {
+  sleep 30
+  }   
 }
 
 if((Test-Path variable:islinux) -and $isLinux) {
@@ -29,8 +24,8 @@ $password = ''
 if($env:appveyor_rdp_password) {
     # take from environment variable
     $password = $env:appveyor_rdp_password       
-    WaitInitialPasswordChange
-    ChangePassword -password $password
+    SleepIfBeforeClone
+    for ($i=0; $i -le 30; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
     [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
 } else {
     # get existing password
