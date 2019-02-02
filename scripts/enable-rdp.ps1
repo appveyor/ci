@@ -8,6 +8,8 @@ function WaitInitialPasswordChange() {
   $end = (Get-Date).AddMinutes(1)
   $changed = $false
   while (!$changed  -and  ($end -gt (Get-Date))) {
+    Write-host "waiting for password change"
+    Get-ItemProperty 'HKLM:\SOFTWARE\Appveyor\Build Agent\State'
     $changed =  (Get-ItemProperty 'HKLM:\SOFTWARE\Appveyor\Build Agent\State' -Name AgentPasswordChanged -ErrorAction Ignore).AgentPasswordChanged -eq "true"
     if (!$changed) {Write-host "."; Sleep 5}
   }
