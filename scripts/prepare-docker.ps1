@@ -36,6 +36,7 @@ function PullRunDockerImages($minOsBuild, $serverCoreTag, $nanoServerTag) {
 
 Switch-DockerLinux
 docker run --rm busybox echo hello_world
+docker run --rm alpine echo hello_world
 
 Switch-DockerWindows
 PullRunDockerImages 14393 'ltsc2016' 'sac2016'
