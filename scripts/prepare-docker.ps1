@@ -56,4 +56,6 @@ get-date | Set-Content c:\1803-1803.txt
 PullRunDockerImages 17763 'ltsc2019' '1809'
 get-date | Set-Content c:\ltsc2019-1809.txt
 
+Switch-DockerLinux
+
 Set-Content -Path $env:SystemDrive\prepare-docker-finished.txt -Value finished
