@@ -35,26 +35,14 @@ function PullRunDockerImages($minOsBuild, $serverCoreTag, $nanoServerTag) {
 }
 
 Switch-DockerLinux
-
 docker run --rm busybox echo hello_world
-get-date | Set-Content c:\busybox.txt
-
 docker run --rm alpine echo hello_world
-get-date | Set-Content c:\alpine.txt
 
 Switch-DockerWindows
-
 PullRunDockerImages 14393 'ltsc2016' 'sac2016'
-get-date | Set-Content c:\ltsc2016-sac2016.txt
-
 PullRunDockerImages 16299 '1709' '1709'
-get-date | Set-Content c:\1709-1709.txt
-
 PullRunDockerImages 17134 '1803' '1803'
-get-date | Set-Content c:\1803-1803.txt
-
 PullRunDockerImages 17763 'ltsc2019' '1809'
-get-date | Set-Content c:\ltsc2019-1809.txt
 
 Switch-DockerLinux
 
