@@ -1,7 +1,7 @@
 function Switch-DockerLinux
 {
     & "$env:ProgramFiles\Docker\Docker\DockerCli.exe" -SwitchLinuxEngine
-        $dshare = (Get-SmbShare -Name X -ErrorAction SilentlyContinue)
+        $dshare = (Get-SmbShare -Name D -ErrorAction SilentlyContinue)
     if (-not $dshare) {
 	    $deUsername = 'DockerExchange'
 	    $dePsw = "ABC" + [guid]::NewGuid().ToString() + "!"
