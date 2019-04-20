@@ -40,7 +40,6 @@ docker run --rm alpine echo hello_world
 
 Switch-DockerWindows
 PullRunDockerImages 14393 'ltsc2016' 'sac2016'
-PullRunDockerImages 16299 '1709' '1709'
 PullRunDockerImages 17134 '1803' '1803'
 PullRunDockerImages 17763 'ltsc2019' '1809'
 
