@@ -1,10 +1,3 @@
-[CmdletBinding()]
-param
-(
-  [Parameter(Mandatory=$false)]
-  [switch]$nonat
-)
-
 function ChangePassword($password) {
   $objUser = [ADSI]("WinNT://$($env:computername)/appveyor")
   $objUser.SetPassword($password)
@@ -30,7 +23,7 @@ $port = 3389
 $password = ''
 if($env:appveyor_rdp_password) {
     # take from environment variable
-    $password = $env:appveyor_rdp_password
+    $password = $env:appveyor_rdp_password       
     SleepIfBeforeClone
     for ($i=0; $i -le 30; $i++) {ChangePassword($password); Start-Sleep -Milliseconds 100}
     [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", $password)
@@ -39,16 +32,13 @@ if($env:appveyor_rdp_password) {
     $password = [Microsoft.Win32.Registry]::GetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", '')
 }
 
-# skip port mapping (for simple private clouds)
-if (-not $nonat) {
-    if($ip.StartsWith('172.24.')) {
-        $port = 33800 + ($ip.split('.')[2] - 16) * 256 + $ip.split('.')[3]
-    } elseif ($ip.StartsWith('192.168.') -or $ip.StartsWith('10.240.')) {
-        # new environment - behind NAT
-        $port = 33800 + ($ip.split('.')[2] - 0) * 256 + $ip.split('.')[3]
-    } elseif ($ip.StartsWith('10.0.')) {
-        $port = 33800 + ($ip.split('.')[2] - 0) * 256 + $ip.split('.')[3]
-    }
+if($ip.StartsWith('172.24.')) {
+    $port = 33800 + ($ip.split('.')[2] - 16) * 256 + $ip.split('.')[3]
+} elseif ($ip.StartsWith('192.168.') -or $ip.StartsWith('10.240.')) {
+    # new environment - behind NAT
+    $port = 33800 + ($ip.split('.')[2] - 0) * 256 + $ip.split('.')[3]
+} elseif ($ip.StartsWith('10.0.')) {
+    $port = 33800 + ($ip.split('.')[2] - 0) * 256 + $ip.split('.')[3]
 }
 
 # get external IP
