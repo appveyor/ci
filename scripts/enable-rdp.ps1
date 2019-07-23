@@ -16,7 +16,7 @@ if((Test-Path variable:islinux) -and $isLinux) {
 }
 
 # get current IP
-$ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like 'ethernet*'}).IPAddress
+$ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like 'ethernet*' -or $_.InterfaceAlias -like '*(ethernet*'})[0].IPAddress
 $port = 3389
 
 # get password or generate
