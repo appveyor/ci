@@ -43,12 +43,9 @@ USERKEY_SHA256=$(ssh-keygen -lf /dev/stdin <<< "${APPVEYOR_SSH_KEY}" | cut -f 2 
 
 # modify MOTD
 if [ -d /etc/update-motd.d ]; then
-  chmod -x /etc/update-motd.d/*
-  (
-      echo 'printf "Welcome to Appveyor Worker of project %s %s\n" "$APPVEYOR_PROJECT_NAME" "$APPVEYOR_BUILD_VERSION"'
-  ) > /etc/update-motd.d/00-appveyor
-  chmod +x /etc/update-motd.d/00-appveyor
-  chmod +x /etc/update-motd.d/00-header
+  sudo chmod -x /etc/update-motd.d/*
+  sudo bash -c "echo printf 'Welcome to Appveyor Worker of project %s %s\n' '\$APPVEYOR_PROJECT_NAME' '\$APPVEYOR_BUILD_VERSION'  > /etc/update-motd.d/00-appveyor"
+  sudo chmod +x /etc/update-motd.d/00-appveyor /etc/update-motd.d/00-header
 fi 
 
 # print out connection command
