@@ -41,6 +41,19 @@ chmod 600 "${HOME}/.ssh/authorized_keys"
 USERKEY_MD5=$(ssh-keygen -E md5 -lf /dev/stdin <<<"${APPVEYOR_SSH_KEY}" | cut -f 2 -d" ")
 USERKEY_SHA256=$(ssh-keygen -lf /dev/stdin <<< "${APPVEYOR_SSH_KEY}" | cut -f 2 -d" ")
 
+# modify MOTD
+if [ -d /etc/update-motd.d ]; then
+  (
+    echo '#!/bin/sh'
+    echo "echo '"
+    echo "Project:       ${APPVEYOR_PROJECT_NAME}"
+    echo "Build Version: ${APPVEYOR_BUILD_VERSION}"
+    echo "URL:           ${APPVEYOR_URL}/project/${APPVEYOR_ACCOUNT_NAME}/${APPVEYOR_PROJECT_SLUG}/build/job/${APPVEYOR_JOB_ID}"  
+    echo "'"
+  ) | sudo tee /etc/update-motd.d/01-appveyor >/dev/null
+  sudo chmod +x /etc/update-motd.d/01-appveyor
+fi 
+
 # print out connection command
 echo "Connect to ${EXT_IP} port $PORT with ${USER_NAME} user:"
 echo -e "${YELLOW}    ssh ${USER_NAME}@${EXT_IP} -p ${PORT}${NC}"
