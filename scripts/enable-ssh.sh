@@ -47,7 +47,7 @@ if [ -d /etc/update-motd.d ]; then
     echo "Project:       ${APPVEYOR_PROJECT_NAME}"
     echo "Build Version: ${APPVEYOR_BUILD_VERSION}"
     echo "URL:           ${APPVEYOR_URL}/project/${APPVEYOR_ACCOUNT_NAME}/${APPVEYOR_PROJECT_SLUG}/build/job/${APPVEYOR_JOB_ID}"  
-  ) > /etc/update-motd.d/01-appveyor
+  ) | sudo tee /etc/update-motd.d/01-appveyor
   sudo chmod +x /etc/update-motd.d/01-appveyor
 fi 
 
