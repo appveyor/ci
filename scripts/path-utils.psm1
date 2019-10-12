@@ -3,7 +3,7 @@
     ([Environment]::GetEnvironmentVariable("path", "machine")).Split(";") | Sort-Object
 }
 
-function Add-Path([string]$item)
+function Add-Path([string]$item,[switch]$before)
 {
     $item = (Get-SanitizedPath $item)
     $pathItemsArray = ([Environment]::GetEnvironmentVariable("path", "machine")).Split(";")
@@ -21,7 +21,11 @@ function Add-Path([string]$item)
 
     if($index -eq -1) {
         # item not found - add it
-        $pathItems.Add($item) | Out-null
+        if ($before) {
+            $pathItems.Insert(0, $item)
+        } else {
+            $pathItems.Add($item) | Out-null
+        }
 
         # update PATH variable
         $updatedPath = $pathItems -join ';'
