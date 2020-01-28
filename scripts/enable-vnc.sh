@@ -29,7 +29,7 @@ PORT=$(( 59000 + INT_IP_ARR[3] ))
 
 # print out connection command
 echo "Connect to ${EXT_IP} port $PORT with ${USER_NAME} user:"
-echo -e "${YELLOW}    vnc ${USER_NAME}@${EXT_IP} -p ${PORT}${NC}"
+echo -e "${YELLOW}    vnc://${USER_NAME}:<password>@${EXT_IP}:${PORT}${NC}"
 if [[ -n "${USERKEY_MD5}" ]]; then
     echo ""
     echo "RSA key fingerprint:"
