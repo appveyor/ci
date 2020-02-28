@@ -2,6 +2,7 @@
 
 USER_NAME=appveyor
 LOCK_FILE="${HOME}/Desktop/Delete me to continue build.txt"
+CURRENT=$(cat /usr/local/var/appveyor/build-agent/psw)
 
 YELLOW='\033[0;33m'
 NC='\033[0m'
@@ -10,12 +11,12 @@ if [[ -z "${APPVEYOR_VNC_PASSWORD}" ]]; then
     echo -e "${YELLOW}APPVEYOR_VNC_PASSWORD${NC} variable is not defined!"
     echo "Generating one..."
     USER_PASSWORD_LENGTH=20
-    APPVEYOR_VNC_PASSWORD=$(LC_CTYPE=C < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${USER_PASSWORD_LENGTH};)
+    APPVEYOR_VNC_PASSWORD=$(head -c200 /dev/urandom | LC_CTYPE=C tr -dc _A-Z-a-z-0-9 | head -c${USER_PASSWORD_LENGTH};)
     echo -e "Password set to ${YELLOW}'${APPVEYOR_VNC_PASSWORD}'${NC}"
 fi
 
-/usr/bin/dscl -u "$USER_NAME" -P "appveyor" . -passwd "/Users/$USER_NAME" "$APPVEYOR_VNC_PASSWORD" &&
-security set-keychain-password -o appveyor -p "$APPVEYOR_VNC_PASSWORD" "/Users/$USER_NAME/Library/Keychains/login.keychain" ||
+/usr/bin/dscl -u "$USER_NAME" -P "$CURRENT" . -passwd "/Users/$USER_NAME" "$APPVEYOR_VNC_PASSWORD" &&
+security set-keychain-password -o "$CURRENT" -p "$APPVEYOR_VNC_PASSWORD" "/Users/$USER_NAME/Library/Keychains/login.keychain" ||
     { echo "Failed to change user's password! Aborting" ; exit 1; }
 
 # get external IP address via https://www.appveyor.com/tools/my-ip.aspx
