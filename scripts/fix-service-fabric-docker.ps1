@@ -5,7 +5,7 @@ if ($dfw) {
     Stop-Process $dfw -Force
 }
 
-Stop-Service "com.docker.service"
+Stop-Service "com.docker.service" -ErrorAction SilentlyContinue
 
 $dd = Get-Process "dockerd" -ErrorAction SilentlyContinue
 if ($dd) {
