@@ -13,6 +13,19 @@ if [[ -z "${APPVEYOR_SSH_KEY}" ]]; then
     exit 1
 fi
 
+# make sure OpenSSH is actually installed before enabling
+if ! command -v sshd &>/dev/null; then
+    if command -v apt-get &>/dev/null; then
+        sudo apt-get update
+        sudo apt-get install -y openssh-server
+    elif command -v yum &>/dev/null; then
+        sudo yum install -y openssh-server
+    elif command -v apk &>/dev/null; then
+        sudo apk update
+        sudo apk add openssh-server
+    fi
+fi
+
 if ! ssh-keygen -E md5 -lf /dev/stdin <<< "${APPVEYOR_SSH_KEY}" >/dev/null; then
     echo "APPVEYOR_SSH_KEY contain invalid key!"
     exit 2
@@ -63,7 +76,7 @@ if [ -d /etc/update-motd.d ]; then
     echo "'"
   ) | sudo tee /etc/update-motd.d/01-appveyor >/dev/null
   sudo chmod +x /etc/update-motd.d/01-appveyor
-fi 
+fi
 if [ "$PLATFORM" = "Darwin" ]; then
   (
     echo "Project:       ${APPVEYOR_PROJECT_NAME}"
