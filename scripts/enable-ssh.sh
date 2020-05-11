@@ -38,7 +38,7 @@ if [ "$PLATFORM" = "Linux" ] && command -v ufw >/dev/null; then
     sudo ufw allow OpenSSH > /dev/null 2>&1
 fi
 
-if  "$PLATFORM" = "FreeBSD" ]
+if [ "$PLATFORM" = "FreeBSD" ]
     # make sure sshd is started
     if ! [[ $(ps aux | grep sshd | grep -vc grep)  > 0 ]] ; then sudo service sshd start; fi
 fi
