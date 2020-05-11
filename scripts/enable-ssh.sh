@@ -38,6 +38,11 @@ if [ "$PLATFORM" = "Linux" ] && command -v ufw >/dev/null; then
     sudo ufw allow OpenSSH > /dev/null 2>&1
 fi
 
+if  "$PLATFORM" = "FreeBSD" ]
+    # make sure sshd is started
+    if ! [[ $(ps aux | grep sshd | grep -vc grep)  > 0 ]] ; then sudo service sshd start; fi
+fi
+
 # get external IP address via https://www.appveyor.com/tools/my-ip.aspx
 EXT_IP=$(curl -sf https://www.appveyor.com/tools/my-ip.aspx)
 
@@ -50,6 +55,11 @@ case "$PLATFORM" in
         ;;
     "Darwin")
         INT_IP=$(ipconfig getifaddr en0)
+        IFS='.' read -r -a INT_IP_ARR <<< "$INT_IP"
+        PORT=$(( 22000 + INT_IP_ARR[3] ))
+        ;;
+    "FreeBSD")
+        INT_IP=$(ifconfig vtnet0 | grep 'inet ' | awk -F ' ' '{ print $2 }')
         IFS='.' read -r -a INT_IP_ARR <<< "$INT_IP"
         PORT=$(( 22000 + INT_IP_ARR[3] ))
         ;;
@@ -77,12 +87,12 @@ if [ -d /etc/update-motd.d ]; then
   ) | sudo tee /etc/update-motd.d/01-appveyor >/dev/null
   sudo chmod +x /etc/update-motd.d/01-appveyor
 fi
-if [ "$PLATFORM" = "Darwin" ]; then
+if [ "$PLATFORM" = "Darwin" ] || [ "$PLATFORM" = "FreeBSD" ]; then
   (
     echo "Project:       ${APPVEYOR_PROJECT_NAME}"
     echo "Build Version: ${APPVEYOR_BUILD_VERSION}"
     echo "URL:           ${APPVEYOR_URL}/project/${APPVEYOR_ACCOUNT_NAME}/${APPVEYOR_PROJECT_SLUG}/build/job/${APPVEYOR_JOB_ID}"
-  ) |sudo tee /etc/motd >/dev/null
+  ) | sudo tee /etc/motd >/dev/null
 fi
 
 # print out connection command
