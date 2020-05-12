@@ -34,8 +34,20 @@ fi
 if [ "$PLATFORM" = "Linux" ] && command -v ufw >/dev/null; then
     trap 'sudo ufw deny OpenSSH >/dev/null' EXIT SIGHUP SIGINT SIGQUIT SIGTERM ERR
 
+    # disable UFW as closing all incoming ports except 22 doesn't work with UFW for some reason
+    sudo ufw --force reset > /dev/null 2>&1
+    sudo ufw disable > /dev/null 2>&1
+    
     # open 22 port for management network interface
-    sudo ufw allow OpenSSH > /dev/null 2>&1
+    sudo iptables -A INPUT -i lo -p all -j ACCEPT
+    sudo iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT    
+    sudo iptables -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+    sudo iptables -A INPUT -j DROP
+fi
+
+if [ "$PLATFORM" = "FreeBSD" ] && ! [[ $(ps aux | grep sshd | grep -vc grep)  > 0 ]]; then
+    # make sure sshd is started
+    sudo service sshd start > /dev/null 2>&1
 fi
 
 # get external IP address via https://www.appveyor.com/tools/my-ip.aspx
@@ -53,12 +65,17 @@ case "$PLATFORM" in
         IFS='.' read -r -a INT_IP_ARR <<< "$INT_IP"
         PORT=$(( 22000 + INT_IP_ARR[3] ))
         ;;
+    "FreeBSD")
+        INT_IP=$(ifconfig vtnet0 | grep 'inet ' | awk -F ' ' '{ print $2 }')
+        IFS='.' read -r -a INT_IP_ARR <<< "$INT_IP"
+        PORT=$(( 22000 + INT_IP_ARR[3] ))
+        ;;
 esac
 
 # add ssh key (if set) to authorized_keys
 mkdir -p ${HOME}/.ssh
 (
-    echo "#Added by Appveyor Build Agent"
+    echo "#Added by AppVeyor Build Agent"
     echo "${APPVEYOR_SSH_KEY}"
 ) >> "${HOME}/.ssh/authorized_keys"
 chmod 600 "${HOME}/.ssh/authorized_keys"
@@ -77,12 +94,12 @@ if [ -d /etc/update-motd.d ]; then
   ) | sudo tee /etc/update-motd.d/01-appveyor >/dev/null
   sudo chmod +x /etc/update-motd.d/01-appveyor
 fi
-if [ "$PLATFORM" = "Darwin" ]; then
+if [ "$PLATFORM" = "Darwin" ] || [ "$PLATFORM" = "FreeBSD" ]; then
   (
     echo "Project:       ${APPVEYOR_PROJECT_NAME}"
     echo "Build Version: ${APPVEYOR_BUILD_VERSION}"
     echo "URL:           ${APPVEYOR_URL}/project/${APPVEYOR_ACCOUNT_NAME}/${APPVEYOR_PROJECT_SLUG}/build/job/${APPVEYOR_JOB_ID}"
-  ) |sudo tee /etc/motd >/dev/null
+  ) | sudo tee /etc/motd >/dev/null
 fi
 
 # print out connection command
@@ -105,10 +122,13 @@ if [[ -n "${APPVEYOR_SSH_BLOCK}" ]] && ${APPVEYOR_SSH_BLOCK}; then
     # create "lock" file.
     touch "${LOCK_FILE}"
     echo -e "Build paused. To resume it, open a SSH session to run '${YELLOW}rm \"${LOCK_FILE}\"${NC}' command."
-    # export all APPVEYOR_* variables to .appveyorrc file so it could be available to ssh session
-    export -p|grep -E '^declare -x APPVEYOR_' > "$HOME/.appveyorrc"
+    
+    # export all session variables to .appveyorrc file so it could be available to ssh session
+    sh -c "export -p" > "$HOME/.appveyorrc"
+    
     # this might fail if there is multiline values
-    echo "source $HOME/.appveyorrc" >> "$HOME/.profile"
+    echo ". $HOME/.appveyorrc" >> "$HOME/.profile"
+    
     # wait until "lock" file is deleted by user.
     while [ -f "${LOCK_FILE}" ]; do
         sleep 1
