@@ -34,13 +34,20 @@ fi
 if [ "$PLATFORM" = "Linux" ] && command -v ufw >/dev/null; then
     trap 'sudo ufw deny OpenSSH >/dev/null' EXIT SIGHUP SIGINT SIGQUIT SIGTERM ERR
 
+    # disable UFW as closing all incoming ports except 22 doesn't work with UFW for some reason
+    sudo ufw --force reset > /dev/null 2>&1
+    sudo ufw disable > /dev/null 2>&1
+    
     # open 22 port for management network interface
-    sudo ufw allow OpenSSH > /dev/null 2>&1
+    sudo iptables -A INPUT -i lo -p all -j ACCEPT
+    sudo iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT    
+    sudo iptables -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+    sudo iptables -A INPUT -j DROP
 fi
 
-if [ "$PLATFORM" = "FreeBSD" ]
+if [ "$PLATFORM" = "FreeBSD" ] && ! [[ $(ps aux | grep sshd | grep -vc grep)  > 0 ]]; then
     # make sure sshd is started
-    if ! [[ $(ps aux | grep sshd | grep -vc grep)  > 0 ]] ; then sudo service sshd start; fi
+    sudo service sshd start
 fi
 
 # get external IP address via https://www.appveyor.com/tools/my-ip.aspx
@@ -68,7 +75,7 @@ esac
 # add ssh key (if set) to authorized_keys
 mkdir -p ${HOME}/.ssh
 (
-    echo "#Added by Appveyor Build Agent"
+    echo "#Added by AppVeyor Build Agent"
     echo "${APPVEYOR_SSH_KEY}"
 ) >> "${HOME}/.ssh/authorized_keys"
 chmod 600 "${HOME}/.ssh/authorized_keys"
@@ -116,9 +123,9 @@ if [[ -n "${APPVEYOR_SSH_BLOCK}" ]] && ${APPVEYOR_SSH_BLOCK}; then
     touch "${LOCK_FILE}"
     echo -e "Build paused. To resume it, open a SSH session to run '${YELLOW}rm \"${LOCK_FILE}\"${NC}' command."
     # export all APPVEYOR_* variables to .appveyorrc file so it could be available to ssh session
-    export -p|grep -E '^declare -x APPVEYOR_' > "$HOME/.appveyorrc"
+    export -p|grep -E '^export APPVEYOR_' > "$HOME/.appveyorrc"
     # this might fail if there is multiline values
-    echo "source $HOME/.appveyorrc" >> "$HOME/.profile"
+    echo ". $HOME/.appveyorrc" >> "$HOME/.profile"
     # wait until "lock" file is deleted by user.
     while [ -f "${LOCK_FILE}" ]; do
         sleep 1
