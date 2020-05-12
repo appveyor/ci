@@ -47,7 +47,7 @@ fi
 
 if [ "$PLATFORM" = "FreeBSD" ] && ! [[ $(ps aux | grep sshd | grep -vc grep)  > 0 ]]; then
     # make sure sshd is started
-    sudo service sshd start
+    sudo service sshd start > /dev/null 2>&1
 fi
 
 # get external IP address via https://www.appveyor.com/tools/my-ip.aspx
@@ -122,10 +122,13 @@ if [[ -n "${APPVEYOR_SSH_BLOCK}" ]] && ${APPVEYOR_SSH_BLOCK}; then
     # create "lock" file.
     touch "${LOCK_FILE}"
     echo -e "Build paused. To resume it, open a SSH session to run '${YELLOW}rm \"${LOCK_FILE}\"${NC}' command."
-    # export all APPVEYOR_* variables to .appveyorrc file so it could be available to ssh session
-    export -p|grep -E '^export APPVEYOR_' > "$HOME/.appveyorrc"
+    
+    # export all session variables to .appveyorrc file so it could be available to ssh session
+    sh -c "export -p" > "$HOME/.appveyorrc"
+    
     # this might fail if there is multiline values
     echo ". $HOME/.appveyorrc" >> "$HOME/.profile"
+    
     # wait until "lock" file is deleted by user.
     while [ -f "${LOCK_FILE}" ]; do
         sleep 1
