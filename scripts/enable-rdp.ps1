@@ -15,10 +15,6 @@ if((Test-Path variable:islinux) -and $isLinux) {
   return
 }
 
-# get current IP
-$ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like 'ethernet*'}).IPAddress
-$port = 3389
-
 # get password or generate
 $password = ''
 if($env:appveyor_rdp_password) {
@@ -32,7 +28,10 @@ if($env:appveyor_rdp_password) {
     $password = [Microsoft.Win32.Registry]::GetValue("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "DefaultPassword", '')
 }
 
+$port = 3389
 if (-not $nonat) {
+    # get current IP
+    $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like 'ethernet*'}).IPAddress
     if($ip.StartsWith('172.24.')) {
         $port = 33800 + ($ip.split('.')[2] - 16) * 256 + $ip.split('.')[3]
     } elseif ($ip.StartsWith('192.168.') -or $ip.StartsWith('10.240.')) {
