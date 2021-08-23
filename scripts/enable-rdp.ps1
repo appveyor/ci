@@ -30,6 +30,10 @@ if($env:appveyor_rdp_password) {
 
 $port = 3389
 if (-not $nonat) {
+    if (!(Get-Command "Get-NetIPAddress" -errorAction SilentlyContinue)) {
+      Write-Warning "NAT translation needs cmdlet 'Get-NetIPAddress', use ps and/or newer VS Image."
+      return
+    }
     # get current IP
     $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like 'ethernet*'}).IPAddress
     if($ip.StartsWith('172.24.')) {
