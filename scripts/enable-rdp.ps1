@@ -47,7 +47,7 @@ if (-not $nonat) {
 }
 
 # get external IP
-$ip = (New-Object Net.WebClient).DownloadString('https://www.appveyor.com/tools/my-ip.aspx').Trim()
+$ip = (New-Object Net.WebClient).DownloadString('https://checkip.amazonaws.com').Trim()
 
 # allow RDP on firewall
 Enable-NetFirewallRule -DisplayName 'Remote Desktop - User Mode (TCP-in)'
