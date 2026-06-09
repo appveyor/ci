@@ -50,8 +50,8 @@ if [ "$PLATFORM" = "FreeBSD" ] && ! [[ $(ps aux | grep sshd | grep -vc grep)  > 
     sudo service sshd start > /dev/null 2>&1
 fi
 
-# get external IP address via https://www.appveyor.com/tools/my-ip.aspx
-EXT_IP=$(curl -sf https://www.appveyor.com/tools/my-ip.aspx)
+# get external IP address
+EXT_IP=$(curl -sf https://checkip.amazonaws.com)
 
 # get ip address of management network interface and figure out corresponding port on NAT
 case "$PLATFORM" in
